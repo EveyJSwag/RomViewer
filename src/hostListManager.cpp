@@ -1,5 +1,5 @@
-#include "netUtil.h"
-#include "hostListManager.h"
+#include "NetUtil.h"
+#include "HostListManager.h"
 #include <stdio.h>
 #include <netdb.h>
 #include <netinet/in.h>

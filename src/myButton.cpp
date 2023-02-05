@@ -1,4 +1,4 @@
-#include "myButton.h"
+#include "MyButton.h"
 
 void idk()
 {

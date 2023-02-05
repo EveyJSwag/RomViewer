@@ -1,13 +1,10 @@
 #ifndef MY_BUTTON
 #define MY_BUTTON
 
+
 #include <iostream>
 #include <string>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QAbstractButton>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDialog>
+#include "QtIncludes.h"
 
 class MyButton : public QPushButton
 {

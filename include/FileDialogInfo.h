@@ -2,29 +2,17 @@
 #define FILE_DIALOG_INFO
 
 #include <iostream>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtCore/QTimer>
-#include <QtGui/QPalette>
-#include <QtWidgets/QTextBrowser>
-#include <QtWidgets/QFileDialog>
-
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QVBoxLayout>
 #include <iomanip>
 #include <sstream>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include "RomReader.h"
-#include "myButton.h"
 #include <vector>
 #include <string>
+
+#include "QtIncludes.h"
+#include "RomReader.h"
+#include "MyButton.h"
 
 
 typedef struct FileDialogInfo : public QObject
