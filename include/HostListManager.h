@@ -4,18 +4,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QLabel>
-#include <QtGui/QPalette>
-#include <QtWidgets/QTextEdit>
-#include <QtWidgets/QTextBrowser>
 #include <pthread.h>
 #include <time.h>
-
+#include "QtIncludes.h"
 
 class HostListManager : public QObject
 {

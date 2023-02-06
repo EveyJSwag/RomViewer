@@ -16,5 +16,6 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QAbstractButton>
+#include <QtWidgets/QListWidgetItem>
 
 #endif
