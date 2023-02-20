@@ -1,13 +1,48 @@
 #include "RomViewer.h"
 
+
+
 RomViewer::RomViewer(int argc, char* argv[])
+{
+    mainApplication = new QApplication(argc, argv);
+    initializeWidgets();
+    connectWidgets();
+}
+
+void RomViewer::connectWidgets()
+{
+    QWidget::connect(
+        findRomButton,
+        &MyButton::clicked,
+        romBrowserDialog,
+        &QFileDialog::exec);
+
+    QWidget::connect(
+        romBrowserDialog, 
+        &QFileDialog::fileSelected, 
+        romDialogInfo, 
+        &FileDialogInfo::setFile);
+
+    QWidget::connect(
+        searchMemoryButton, 
+        &MyButton::clicked, 
+        romDialogInfo, 
+        &FileDialogInfo::displayMemoryAtAddress);
+
+    QWidget::connect(
+        searchOpCodeButton, 
+        &MyButton::clicked, 
+        romDialogInfo, 
+        &FileDialogInfo::searchBytePattern);
+}
+
+void RomViewer::initializeWidgets()
 {
     QRect mainButtonSize;
     QSize fixedWindowSize;
     fixedWindowSize.setHeight(MAIN_WINDOW_HEIGHT);
     fixedWindowSize.setWidth(MAIN_WINDOW_WIDTH);
 
-    mainApplication = new QApplication(argc, argv);
     mainWindow = new QMainWindow();
 
     addressTextEdit = new QLineEdit(mainWindow);
@@ -52,14 +87,14 @@ RomViewer::RomViewer(int argc, char* argv[])
     searchOpCodeButton->setDisabled(true);
     QRect searchOpCodeButtonGeo = searchOpCodeButton->geometry();
     searchOpCodeButton->setGeometry(
-        X_BUFFER * 2 + findRomButton->width() * 2 + 50,
+        X_BUFFER * 2 + findRomButton->width() * 2 + 20,
         MAIN_WINDOW_HEIGHT - Y_BUFFER - searchOpCodeButton->height(),
-        searchOpCodeButton->width() + 50,
+        searchOpCodeButton->width() + 30,
         searchOpCodeButton->height());
 
     opCodeSearchResult = new QTextBrowser(mainWindow);
     opCodeSearchResult->setGeometry(
-        X_BUFFER * 2 + findRomButton->width() * 2 + 50,
+        X_BUFFER * 2 + findRomButton->width() * 2 + 20,
         Y_BUFFER,
         MAIN_WINDOW_WIDTH/4 - X_BUFFER*2,
         MAIN_WINDOW_HEIGHT/2 + Y_BUFFER * 2);
@@ -93,6 +128,7 @@ RomViewer::RomViewer(int argc, char* argv[])
     formatVbox->addWidget(hexCharChoice);
     formatVbox->addWidget(charChoice);
     QRect formatSelectorGeo = formatSelector->geometry();
+    mainWindow->setFixedSize(fixedWindowSize);
 
     formatSelector->setGeometry(
         X_BUFFER,
@@ -103,48 +139,8 @@ RomViewer::RomViewer(int argc, char* argv[])
     formatSelector->setLayout(formatVbox);
 
     formatSelector->setDisabled(true);
-
-    romDialogInfo = new FileDialogInfo(
-        romMemoryBrowser,
-        addressTextEdit,
-        searchMemoryButton,
-        formatSelector,
-        searchOpCodeButton, 
-        opCodeSearchResult,
-        opCodeSearchEdit);
-
-    mainWindow->setFixedSize(fixedWindowSize);
-
-    connectWidgets();
+    romDialogInfo = new FileDialogInfo(this);
 }
-
-void RomViewer::connectWidgets()
-{
-    QWidget::connect(
-        findRomButton,
-        &MyButton::clicked,
-        romBrowserDialog,
-        &QFileDialog::exec);
-
-    QWidget::connect(
-        romBrowserDialog, 
-        &QFileDialog::fileSelected, 
-        romDialogInfo, 
-        &FileDialogInfo::setFile);
-
-    QWidget::connect(
-        searchMemoryButton, 
-        &MyButton::clicked, 
-        romDialogInfo, 
-        &FileDialogInfo::displayMemoryAtAddress);
-
-    QWidget::connect(
-        searchOpCodeButton, 
-        &MyButton::clicked, 
-        romDialogInfo, 
-        &FileDialogInfo::searchBytePattern);
-}
-
 
 void RomViewer::Run()
 {
@@ -156,4 +152,54 @@ RomViewer::~RomViewer()
 {
     delete mainApplication;
     delete mainWindow;
+}
+
+void RomViewer::enableWidgets()
+{
+    romMemoryBrowser->setEnabled(true);
+    addressTextEdit->setEnabled(true);
+    searchMemoryButton->setEnabled(true);
+    formatSelector->setEnabled(true);
+    searchOpCodeButton->setEnabled(true);
+    opCodeSearchResult->setEnabled(true);
+    opCodeSearchEdit->setEnabled(true);
+}
+
+
+void RomViewer::setRomMemoryBrowserText(QString& textToSet)
+{
+    romMemoryBrowser->setText(textToSet);
+}
+void RomViewer::updateRomMemoryBrowser()
+{
+    romMemoryBrowser->update();
+}
+
+QString RomViewer::getAddressText()
+{
+    return addressTextEdit->text();
+}
+QObjectList RomViewer::getFormatSelectorChildren()
+{
+    return formatSelector->children();
+}
+
+QString RomViewer::getSearchParamText()
+{
+    return opCodeSearchEdit->text();
+}
+
+void RomViewer::clearOpCodeSearchResult()
+{
+    opCodeSearchResult->clear();
+}
+
+void RomViewer::setOpCodeSearchResultText(std::string textToSet)
+{
+    opCodeSearchResult->setText(textToSet.c_str());
+}
+
+void RomViewer::appendOpCodeSearchResultText(QString textToSet)
+{
+    opCodeSearchResult->append(textToSet);
 }

@@ -13,7 +13,9 @@
 #include "QtIncludes.h"
 #include "RomReader.h"
 #include "MyButton.h"
+#include "RomViewer.h"
 
+class RomViewer;
 
 typedef struct FileDialogInfo : public QObject
 {
@@ -27,6 +29,8 @@ public:
     std::string bytesToSearch;
     std::vector<std::string> opcodeMatchStrings;
 
+    RomViewer* romViewer;
+
     QTextBrowser* textBrowser;
     QLineEdit* lineEdit;
     MyButton* searchButton;
@@ -36,14 +40,8 @@ public:
     QLineEdit*  searchParamEdit;
 
     FileDialogInfo(){}
-    FileDialogInfo(
-        QTextBrowser* textBrowserRef,
-        QLineEdit* lineEditRef,
-        MyButton* searchButtonRef,
-        QGroupBox* groupBoxRef,
-        MyButton* opCodeSearchRef,
-        QTextBrowser* searchResBrowseRef,
-        QLineEdit*  searchParamEditRef);
+
+    FileDialogInfo(RomViewer* romViewerRef);
     std::string selectedFile;
 
     typedef enum FormatEnum{ 

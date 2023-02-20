@@ -1,21 +1,8 @@
 #include "FileDialogInfo.h"
 
-FileDialogInfo::FileDialogInfo(
-    QTextBrowser* textBrowserRef,
-    QLineEdit* lineEditRef,
-    MyButton* searchButtonRef,
-    QGroupBox* groupBoxRef,
-    MyButton* opCodeSearchRef,
-    QTextBrowser* searchResBrowseRef,
-    QLineEdit*  searchParamEditRef)
+FileDialogInfo::FileDialogInfo(RomViewer* romViewerRef)
 {
-    textBrowser = textBrowserRef;
-    lineEdit = lineEditRef;
-    searchButton = searchButtonRef;
-    groupBox = groupBoxRef;
-    opCodeSearch = opCodeSearchRef;
-    searchResBrowse = searchResBrowseRef;
-    searchParamEdit = searchParamEditRef;
+    romViewer = romViewerRef;
 }
 
 void FileDialogInfo::setFile(const QString& file)
@@ -23,13 +10,7 @@ void FileDialogInfo::setFile(const QString& file)
     selectedFile = file.toStdString();
     romDataBuffer = (char*)malloc(1049088);
     getRomData(selectedFile,1049088,romDataBuffer);
-    textBrowser->setEnabled(true);
-    lineEdit->setEnabled(true);
-    searchButton->setEnabled(true);
-    groupBox->setEnabled(true);
-    opCodeSearch->setEnabled(true);
-    searchResBrowse->setEnabled(true);
-    searchParamEdit->setEnabled(true);
+    romViewer->enableWidgets();
 }
 
 void FileDialogInfo::dumpCurrentBuffer()
@@ -42,7 +23,7 @@ void FileDialogInfo::dumpCurrentBuffer()
 void FileDialogInfo::displayMemoryAtAddress()
 {
     FormatEnum formatToUse = FormatEnum::character_format;
-    QObjectList formatChildren = groupBox->children();
+    QObjectList formatChildren = romViewer->getFormatSelectorChildren();
     for (int i = 0; i < formatChildren.size() - 1; i++)
     {
         QRadioButton* qrbRef = (QRadioButton*)formatChildren[i];
@@ -53,7 +34,7 @@ void FileDialogInfo::displayMemoryAtAddress()
         }
     }
 
-    QString lineText = lineEdit->text();
+    QString lineText = romViewer->getAddressText();
     std::string lineString = lineText.toStdString();
     int addressToView = std::stoi(lineString,0,16);
     std::string stringToDisplay;
@@ -92,14 +73,15 @@ void FileDialogInfo::displayMemoryAtAddress()
     bool saveString = false;
     
     stringToDisplay = displayStream.str();
-    textBrowser->setText(QString(stringToDisplay.c_str()));
-    textBrowser->update();
+    QString qStringToSet = QString(stringToDisplay.c_str());
+    romViewer->setRomMemoryBrowserText(qStringToSet);
+    romViewer->updateRomMemoryBrowser();
 }
 
 void FileDialogInfo::searchBytePattern()
 {
     opcodeMatchStrings.clear();
-    QString lineText = searchParamEdit->text();
+    QString lineText = romViewer->getSearchParamText();
     std::string lineString = lineText.toStdString();
     int addressToView = std::stoi(lineString,0,16);
     unsigned char* searchBytes = (unsigned char*)malloc(lineString.size()/2);
@@ -136,13 +118,13 @@ void FileDialogInfo::searchBytePattern()
         }
     }
 
-    searchResBrowse->clear();
-    searchResBrowse->setText("");
+    romViewer->clearOpCodeSearchResult();
+    romViewer->setOpCodeSearchResultText("");
     for (std::vector<std::string>::iterator firstMatch = opcodeMatchStrings.begin(); 
          firstMatch != opcodeMatchStrings.end(); 
          firstMatch++)
     {
         std::string browseString = *firstMatch;
-        searchResBrowse->append(QString(browseString.c_str()));
+        romViewer->appendOpCodeSearchResultText(QString(browseString.c_str()));
     }
 }

@@ -14,17 +14,36 @@
 #include "MyButton.h"
 #include "FileDialogInfo.h"
 
+typedef struct FileDialogInfo FileDialogInfo;
+
 class RomViewer
 {
 public:
     RomViewer(int argc, char * argv[]);
     ~RomViewer();
     void Run();
+    void enableWidgets();
+
+    void setRomMemoryBrowserText(QString& textToSet);
+    void updateRomMemoryBrowser();
+
+    QString getAddressText();
+
+    QObjectList getFormatSelectorChildren();
+
+    QString getSearchParamText();
+
+    void clearOpCodeSearchResult();
+    void setOpCodeSearchResultText(std::string textToSet);
+    void appendOpCodeSearchResultText(QString textToSet);
+
 private:
     const int MAIN_WINDOW_HEIGHT = 500;
     const int MAIN_WINDOW_WIDTH  = 1200;
     const int Y_BUFFER = 10;
     const int X_BUFFER = 10;
+
+    const int ROW_WIDTH = 24;
 
     QApplication* mainApplication;
     QMainWindow* mainWindow;
@@ -55,7 +74,12 @@ private:
 
     FileDialogInfo* romDialogInfo;
 
+    std::vector<QLabel> memoryAddressLabels;
+
+    void initializeWidgets();
+
     void connectWidgets();
+
 
 };
 #endif
