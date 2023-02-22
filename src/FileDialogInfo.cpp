@@ -61,6 +61,7 @@ void FileDialogInfo::displayMemoryAtAddress()
                 unsigned int currentElement = ((unsigned char*)romDataBuffer)[i];
                 displayStream << std::hex << std::setw(2) << std::setfill('0') << currentElement << " ";
             }
+            romViewer->displayMemoryAddressLabels(128/24 + 1);
             break;
         case FormatEnum::character_format:
             for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 32; i++)

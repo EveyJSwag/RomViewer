@@ -37,6 +37,8 @@ public:
     void setOpCodeSearchResultText(std::string textToSet);
     void appendOpCodeSearchResultText(QString textToSet);
 
+    void displayMemoryAddressLabels(int numRows);
+
 private:
     const int MAIN_WINDOW_HEIGHT = 500;
     const int MAIN_WINDOW_WIDTH  = 1200;
@@ -74,7 +76,7 @@ private:
 
     FileDialogInfo* romDialogInfo;
 
-    std::vector<QLabel> memoryAddressLabels;
+    std::vector<QLabel*> memoryAddressLabels;
 
     void initializeWidgets();
 

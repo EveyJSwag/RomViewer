@@ -1,6 +1,5 @@
 #include "RomViewer.h"
-
-
+#include <sstream>
 
 RomViewer::RomViewer(int argc, char* argv[])
 {
@@ -165,7 +164,6 @@ void RomViewer::enableWidgets()
     opCodeSearchEdit->setEnabled(true);
 }
 
-
 void RomViewer::setRomMemoryBrowserText(QString& textToSet)
 {
     romMemoryBrowser->setText(textToSet);
@@ -202,4 +200,34 @@ void RomViewer::setOpCodeSearchResultText(std::string textToSet)
 void RomViewer::appendOpCodeSearchResultText(QString textToSet)
 {
     opCodeSearchResult->append(textToSet);
+}
+
+void RomViewer::displayMemoryAddressLabels(int numRows)
+{
+    QRect locationOfMemAddrWidget;
+    int yLocation = 0;
+    QFont memoryFont("Monospace");
+    memoryFont.setStyleHint(QFont::Monospace);
+    for (int i = 0; i < numRows; i++)
+    {
+        QLabel* rowLabel = new QLabel(mainWindow);
+        std::stringstream addrHexStream;
+        addrHexStream << std::hex << std::setw(4) << ROW_WIDTH * (i);
+        rowLabel->setText(QString(addrHexStream.str().c_str()));
+
+        rowLabel->setGeometry(
+            romMemoryBrowser->x() - 40,
+            romMemoryBrowser->y() + yLocation - 6,
+            rowLabel->width(),
+            rowLabel->height());
+
+        rowLabel->setFont(memoryFont);
+
+        rowLabel->setEnabled(true);
+        rowLabel->show();
+        yLocation += 18;
+
+        memoryAddressLabels.push_back(rowLabel);
+        std::cout << "in function" << std::endl;
+    }
 }
