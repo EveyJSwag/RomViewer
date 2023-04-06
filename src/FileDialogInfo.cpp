@@ -8,8 +8,9 @@ FileDialogInfo::FileDialogInfo(RomViewer* romViewerRef)
 void FileDialogInfo::setFile(const QString& file)
 {
     selectedFile = file.toStdString();
-    romDataBuffer = (char*)malloc(1049088);
-    getRomData(selectedFile,1049088,romDataBuffer);
+    getFileSize(selectedFile);
+    romDataBuffer = (char*)malloc(romFileSize);
+    getRomData(selectedFile,romFileSize,romDataBuffer);
     romViewer->enableWidgets();
 }
 
@@ -18,6 +19,17 @@ void FileDialogInfo::dumpCurrentBuffer()
     int dumpTarget = open("dumpedrom.smc", O_CREAT | O_RDWR);
     int rc = write(dumpTarget,typeRomDataBuffer,1049088);
     close(dumpTarget);
+}
+
+void FileDialogInfo::getFileSize(std::string romFile)
+{
+    FILE* filePointer;
+    filePointer = fopen(romFile.c_str(), "r");
+
+    fseek(filePointer, 0L, SEEK_END);
+    romFileSize = ftell(filePointer);
+
+    fclose(filePointer);
 }
 
 void FileDialogInfo::displayMemoryAtAddress()
@@ -56,15 +68,17 @@ void FileDialogInfo::displayMemoryAtAddress()
             }
             break;
         case FormatEnum::char_hex_format:
-            for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 128; i++)
+            //for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 128; i++)
+            for (int i = addressToView; i < addressToView + 256; i++)
             {
                 unsigned int currentElement = ((unsigned char*)romDataBuffer)[i];
                 displayStream << std::hex << std::setw(2) << std::setfill('0') << currentElement << " ";
             }
-            romViewer->displayMemoryAddressLabels(128/24 + 1);
+            //romViewer->displayMemoryAddressLabels(128/24 + 1);
             break;
         case FormatEnum::character_format:
-            for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 32; i++)
+            //for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 32; i++)
+            for (int i = addressToView; i < addressToView + 256; i++)
             {
                 char currentElement = ((char*)romDataBuffer)[i];
                 displayStream << currentElement << " ";
@@ -96,7 +110,7 @@ void FileDialogInfo::searchBytePattern()
     int numBytes = lineString.size() / 2;
     int numOfConsecutiveMatches = 0;
     unsigned char* searchByteStartAddr = searchBytes;
-    for (int i = 0; i < 1049088; i++)
+    for (unsigned long i = 0; i < romFileSize; i++)
     {
         unsigned char currentByte = ((unsigned char*) romDataBuffer)[i];
         if ( currentByte == *searchBytes)
@@ -112,7 +126,8 @@ void FileDialogInfo::searchBytePattern()
         if (numOfConsecutiveMatches == numBytes)
         {
             std::stringstream entryStream;
-            entryStream << "0x" << std::hex << (i - numBytes + 1) - 0x200;
+            //entryStream << "0x" << std::hex << (i - numBytes + 1) - 0x200;
+            entryStream << "0x" << std::hex << (i - numBytes + 1);
             opcodeMatchStrings.push_back(entryStream.str());
             numOfConsecutiveMatches = 0;
             searchBytes = searchByteStartAddr;

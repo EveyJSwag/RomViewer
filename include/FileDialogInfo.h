@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <vector>
 #include <string>
+#include <stdio.h>
 
 #include "QtIncludes.h"
 #include "RomReader.h"
@@ -26,6 +27,8 @@ public:
 
     unsigned char typeRomDataBuffer[1049088];
 
+    unsigned long romFileSize;
+
     std::string bytesToSearch;
     std::vector<std::string> opcodeMatchStrings;
 
@@ -38,6 +41,8 @@ public:
     MyButton* opCodeSearch;
     QTextBrowser* searchResBrowse;
     QLineEdit*  searchParamEdit;
+
+    void getFileSize(std::string romFile);
 
     FileDialogInfo(){}
 
@@ -55,6 +60,7 @@ public:
     void dumpCurrentBuffer();
     void displayMemoryAtAddress();
     void searchBytePattern();
+    void writeToMemoryAtAddress();
 
     void* romDataBuffer;
 

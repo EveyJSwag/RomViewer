@@ -39,6 +39,9 @@ public:
 
     void displayMemoryAddressLabels(int numRows);
 
+    QString getTargetAddressText();
+    QString getTargetContentText();
+
 private:
     const int MAIN_WINDOW_HEIGHT = 500;
     const int MAIN_WINDOW_WIDTH  = 1200;
@@ -57,6 +60,10 @@ private:
     MyButton* findRomButton;
 
     MyButton* searchOpCodeButton;
+
+    MyButton* writeToMemoryButton;
+    QLineEdit* contentAddressEdit;
+    QLineEdit* memoryContentEdit;
 
     QTextBrowser* opCodeSearchResult;
 

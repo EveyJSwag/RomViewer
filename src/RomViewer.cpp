@@ -91,24 +91,57 @@ void RomViewer::initializeWidgets()
         searchOpCodeButton->width() + 30,
         searchOpCodeButton->height());
 
+    int osw = 100;
+    int osh = 30;
+
     opCodeSearchResult = new QTextBrowser(mainWindow);
     opCodeSearchResult->setGeometry(
         X_BUFFER * 2 + findRomButton->width() * 2 + 20,
-        Y_BUFFER,
+        MAIN_WINDOW_HEIGHT - Y_BUFFER - (MAIN_WINDOW_HEIGHT/2 + Y_BUFFER * 3 + osh *2),
         MAIN_WINDOW_WIDTH/4 - X_BUFFER*2,
         MAIN_WINDOW_HEIGHT/2 + Y_BUFFER * 2);
 
     opCodeSearchEdit = new QLineEdit(mainWindow);
     opCodeSearchEdit->setGeometry(
         opCodeSearchResult->x(),
-        opCodeSearchResult->height() + 2 * Y_BUFFER,
+        MAIN_WINDOW_HEIGHT - (searchOpCodeButton->height() * 2) - Y_BUFFER,
         opCodeSearchEdit->width(),
         opCodeSearchEdit->height());
     opCodeSearchEdit->setInputMask(QString("HHHHHHHH"));
     opCodeSearchEdit->setDisabled(true);
 
+
+    contentAddressEdit = new QLineEdit(mainWindow);
+    contentAddressEdit->setGeometry(
+        opCodeSearchResult->x(),
+        Y_BUFFER,
+        contentAddressEdit->width(),
+        contentAddressEdit->height());
+    contentAddressEdit->setInputMask(QString("HHHHHHHH"));
+    contentAddressEdit->setDisabled(true);
+
+    memoryContentEdit = new QLineEdit(mainWindow);
+    memoryContentEdit->setGeometry(
+        opCodeSearchResult->x(),
+        Y_BUFFER + contentAddressEdit->height(),
+        memoryContentEdit->width(),
+        memoryContentEdit->height());
+    memoryContentEdit->setInputMask(QString("HHHHHHHH"));
+    memoryContentEdit->setDisabled(true);
+
+    std::string writeToMemoryString = std::string("Write to Memory");
+    writeToMemoryButton = new MyButton(writeToMemoryString, (QWidget*)mainWindow);
+    writeToMemoryButton->setGeometry(
+        opCodeSearchResult->x(),
+        Y_BUFFER + contentAddressEdit->height()*2,
+        writeToMemoryButton->width() + 10,
+        writeToMemoryButton->height());
+    writeToMemoryButton->setDisabled(true);
+
+    QStringList fileNameFilters;
+    fileNameFilters << "*.smc" << "*.gba";
     romBrowserDialog = new QFileDialog(mainWindow);
-    romBrowserDialog->setNameFilter(QString("*smc"));
+    romBrowserDialog->setNameFilters(fileNameFilters);
 
     formatSelector = new QGroupBox(mainWindow);
     formatSelector->setTitle(QString("Format Selector"));
@@ -162,6 +195,9 @@ void RomViewer::enableWidgets()
     searchOpCodeButton->setEnabled(true);
     opCodeSearchResult->setEnabled(true);
     opCodeSearchEdit->setEnabled(true);
+    writeToMemoryButton->setEnabled(true);
+    contentAddressEdit->setEnabled(true);
+    memoryContentEdit->setEnabled(true);
 }
 
 void RomViewer::setRomMemoryBrowserText(QString& textToSet)
@@ -202,6 +238,16 @@ void RomViewer::appendOpCodeSearchResultText(QString textToSet)
     opCodeSearchResult->append(textToSet);
 }
 
+QString RomViewer::getTargetAddressText()
+{
+    return contentAddressEdit->text();
+}
+
+QString RomViewer::getTargetContentText()
+{
+    return memoryContentEdit->text();
+}
+
 void RomViewer::displayMemoryAddressLabels(int numRows)
 {
     QRect locationOfMemAddrWidget;
@@ -228,6 +274,5 @@ void RomViewer::displayMemoryAddressLabels(int numRows)
         yLocation += 18;
 
         memoryAddressLabels.push_back(rowLabel);
-        std::cout << "in function" << std::endl;
     }
 }
