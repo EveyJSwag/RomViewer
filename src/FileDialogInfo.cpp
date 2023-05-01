@@ -1,4 +1,5 @@
 #include "FileDialogInfo.h"
+#include "FECharacter.h"
 
 FileDialogInfo::FileDialogInfo(RomViewer* romViewerRef)
 {
@@ -10,6 +11,7 @@ void FileDialogInfo::setFile(const QString& file)
     selectedFile = file.toStdString();
     getFileSize(selectedFile);
     romDataBuffer = (char*)malloc(romFileSize);
+    memset(romDataBuffer, 0, romFileSize);
     getRomData(selectedFile,romFileSize,romDataBuffer);
     romViewer->enableWidgets();
 }
@@ -32,6 +34,16 @@ void FileDialogInfo::getFileSize(std::string romFile)
     fclose(filePointer);
 }
 
+void FileDialogInfo::writeToMemoryAtAddress()
+{
+    unsigned int addressToWriteAt = std::stoi(romViewer->getTargetAddressText().toStdString(), 0,16);
+    unsigned int uIntToWrite      = std::stoi(romViewer->getTargetContentText().toStdString(), 0,16);
+    memcpy((unsigned char*)romDataBuffer+addressToWriteAt, &uIntToWrite, 4);
+    int dumpTarget = open("roms/modified.gba", O_CREAT | O_RDWR | O_APPEND);
+    int rc = write(dumpTarget, romDataBuffer, romFileSize);
+    int filler = 0;
+}
+
 void FileDialogInfo::displayMemoryAtAddress()
 {
     FormatEnum formatToUse = FormatEnum::character_format;
@@ -48,7 +60,7 @@ void FileDialogInfo::displayMemoryAtAddress()
 
     QString lineText = romViewer->getAddressText();
     std::string lineString = lineText.toStdString();
-    int addressToView = std::stoi(lineString,0,16);
+    long addressToView = std::stol(lineString,0,16);
     std::string stringToDisplay;
     std::stringstream displayStream;
     switch(formatToUse)
@@ -69,7 +81,7 @@ void FileDialogInfo::displayMemoryAtAddress()
             break;
         case FormatEnum::char_hex_format:
             //for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 128; i++)
-            for (int i = addressToView; i < addressToView + 256; i++)
+            for (long i = addressToView; i < addressToView + 256; i++)
             {
                 unsigned int currentElement = ((unsigned char*)romDataBuffer)[i];
                 displayStream << std::hex << std::setw(2) << std::setfill('0') << currentElement << " ";
@@ -85,6 +97,12 @@ void FileDialogInfo::displayMemoryAtAddress()
             }
         break;
     }
+
+    unsigned char characterData[52];
+    memcpy(characterData, (unsigned char*)romDataBuffer + 0x803d64, 52);
+
+    FECharacter erika = FECharacter(characterData);
+
     bool saveString = false;
     
     stringToDisplay = displayStream.str();
@@ -98,7 +116,7 @@ void FileDialogInfo::searchBytePattern()
     opcodeMatchStrings.clear();
     QString lineText = romViewer->getSearchParamText();
     std::string lineString = lineText.toStdString();
-    int addressToView = std::stoi(lineString,0,16);
+    long addressToView = std::stol(lineString,0,16);
     unsigned char* searchBytes = (unsigned char*)malloc(lineString.size()/2);
     int searchByteIndex = 0;
     for (int i = 0; i < lineString.size(); i+=2)

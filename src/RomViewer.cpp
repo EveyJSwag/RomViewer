@@ -33,6 +33,12 @@ void RomViewer::connectWidgets()
         &MyButton::clicked, 
         romDialogInfo, 
         &FileDialogInfo::searchBytePattern);
+
+    QWidget::connect(
+        writeToMemoryButton,
+        &MyButton::clicked,
+        romDialogInfo,
+        &FileDialogInfo::writeToMemoryAtAddress);
 }
 
 void RomViewer::initializeWidgets()
