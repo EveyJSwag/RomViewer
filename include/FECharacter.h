@@ -4,6 +4,7 @@ class FECharacter
 {
 public:
     static const int CHARACTER_SIZE = 52;
+    static const unsigned int CLASS_ADDR = 0x8071b8; 
 
     FECharacter(unsigned char aRawCharacterData[CHARACTER_SIZE]);
 
