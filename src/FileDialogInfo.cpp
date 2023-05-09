@@ -1,5 +1,8 @@
-#include "FileDialogInfo.h"
+#include <sys/stat.h>
+
 #include "FECharacter.h"
+#include "FEClass.h"
+#include "FileDialogInfo.h"
 
 FileDialogInfo::FileDialogInfo(RomViewer* romViewerRef)
 {
@@ -37,10 +40,14 @@ void FileDialogInfo::getFileSize(std::string romFile)
 void FileDialogInfo::writeToMemoryAtAddress()
 {
     unsigned int addressToWriteAt = std::stoi(romViewer->getTargetAddressText().toStdString(), 0,16);
-    unsigned int uIntToWrite      = std::stoi(romViewer->getTargetContentText().toStdString(), 0,16);
+    unsigned long uIntToWrite      = std::stol(romViewer->getTargetContentText().toStdString(), 0,16);
     memcpy((unsigned char*)romDataBuffer+addressToWriteAt, &uIntToWrite, 4);
+
+    remove("roms/modified.gba");
     int dumpTarget = open("roms/modified.gba", O_CREAT | O_RDWR | O_APPEND);
+    mode_t modifiedMode = 0666;
     int rc = write(dumpTarget, romDataBuffer, romFileSize);
+    chmod("roms/modified.gba", modifiedMode);
     int filler = 0;
 }
 
@@ -57,10 +64,9 @@ void FileDialogInfo::displayMemoryAtAddress()
             break;
         }
     }
-
     QString lineText = romViewer->getAddressText();
     std::string lineString = lineText.toStdString();
-    long addressToView = std::stol(lineString,0,16);
+    unsigned long long addressToView = std::stoull(lineString,0,16);
     std::string stringToDisplay;
     std::stringstream displayStream;
     switch(formatToUse)
@@ -81,7 +87,7 @@ void FileDialogInfo::displayMemoryAtAddress()
             break;
         case FormatEnum::char_hex_format:
             //for (int i = addressToView + INDEX_OFFSET; i < addressToView + INDEX_OFFSET + 128; i++)
-            for (long i = addressToView; i < addressToView + 256; i++)
+            for (unsigned long long i = addressToView; i < addressToView + 256; i++)
             {
                 unsigned int currentElement = ((unsigned char*)romDataBuffer)[i];
                 displayStream << std::hex << std::setw(2) << std::setfill('0') << currentElement << " ";
@@ -98,10 +104,21 @@ void FileDialogInfo::displayMemoryAtAddress()
         break;
     }
 
-    unsigned char characterData[52];
-    memcpy(characterData, (unsigned char*)romDataBuffer + 0x803d64, 52);
+    unsigned int baseClassAddr = 0x8071b8;
+    unsigned char characterData[FECharacter::CHARACTER_SIZE];
+    unsigned char classData[FEClass::CLASS_SIZE];
+    memcpy(
+        characterData, 
+        (unsigned char*)romDataBuffer + 0x803d64, 
+        FECharacter::CHARACTER_SIZE);
 
+    memcpy(
+        classData, 
+        (unsigned char*)romDataBuffer + baseClassAddr + FEClass::CLASS_SIZE, 
+        FEClass::CLASS_SIZE);
+  
     FECharacter erika = FECharacter(characterData);
+    FEClass lord = FEClass(classData);
 
     bool saveString = false;
     
