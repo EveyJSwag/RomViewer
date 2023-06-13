@@ -1,4 +1,5 @@
 #include "RomViewer.h"
+#include "ColorUtils.h"
 #include <sstream>
 
 RomViewer::RomViewer(int argc, char* argv[])
@@ -45,9 +46,11 @@ void RomViewer::initializeWidgets()
 {
     QRect mainButtonSize;
     QSize fixedWindowSize;
+
+    //colorBitmap->
     fixedWindowSize.setHeight(MAIN_WINDOW_HEIGHT);
     fixedWindowSize.setWidth(MAIN_WINDOW_WIDTH);
-
+    
     mainWindow = new QMainWindow();
 
     addressTextEdit = new QLineEdit(mainWindow);
@@ -55,7 +58,6 @@ void RomViewer::initializeWidgets()
     addressTextEdit->setGeometry(X_BUFFER,Y_BUFFER,addressTextEditRect.width(),addressTextEditRect.height());
     addressTextEdit->setInputMask(QString("HHHHHHHH"));
     addressTextEdit->setDisabled(true);
-
     romMemoryBrowser = new QTextBrowser(mainWindow);
     QFont memoryFont("Monospace");
     memoryFont.setStyleHint(QFont::Monospace);
@@ -178,6 +180,47 @@ void RomViewer::initializeWidgets()
 
     formatSelector->setDisabled(true);
     romDialogInfo = new FileDialogInfo(this);
+
+
+    QSize bitmapSize = QSize(64,64);
+    unsigned char dataBitArray[64*64*2];
+    memset(dataBitArray,0,64*64*2);
+    int dataBitIndex = 0;
+    const unsigned char COLOR_MASK = 0x1F;
+    const unsigned char R_SHIFT = 10;
+    const unsigned char G_SHIFT = 5;
+    const unsigned char B_SHIFT = 0;
+    unsigned short colorShort = 0x11ff;
+    unsigned char greenPixel = ColorUtils::getShortGreenPixel(colorShort);
+    unsigned char redPixel   = ColorUtils::getShortRedPixel(colorShort);
+    unsigned char bluePixel  = ColorUtils::getShortBluePixel(colorShort);
+
+    for (int i = 0; i < 64; i++)
+    {
+        for(int j = 0; j < 64; j++)
+        {
+            dataBitArray[dataBitIndex] = ColorUtils::makeShortPixelLow(redPixel, bluePixel, greenPixel);
+            dataBitIndex++;
+            dataBitArray[dataBitIndex] = ColorUtils::makeShortPixelHigh(redPixel, bluePixel, greenPixel);
+            dataBitIndex++;
+        }
+    }
+    QImage pixelImage = QImage(dataBitArray, 64,64,QImage::Format_RGB555);
+    QPixmap convertedImage = QPixmap::fromImage(pixelImage);
+    //Bitmap colorBitmap;
+    //QImage test;
+    //colorBitmap = QBitmap::fromData(bitmapSize, dataBitArray, QImage::Format_RGB888);
+
+
+    QLabel* imageLabel = new QLabel((QWidget*)mainWindow);
+    imageLabel->setPixmap(convertedImage);
+    imageLabel->setGeometry(
+        20, 
+        20, 
+        imageLabel->geometry().width()*2, 
+        imageLabel->geometry().height()*2);
+
+
 }
 
 void RomViewer::Run()

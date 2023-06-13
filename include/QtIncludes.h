@@ -17,5 +17,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QAbstractButton>
 #include <QtWidgets/QListWidgetItem>
+#include <QtGui/QBitmap>
 
 #endif

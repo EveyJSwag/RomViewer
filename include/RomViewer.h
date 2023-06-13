@@ -50,7 +50,7 @@ private:
     const int X_BUFFER = 10;
 
     const int ROW_WIDTH = 24;
-
+    QGuiApplication* guiAPp;
     QApplication* mainApplication;
     QMainWindow* mainWindow;
 
@@ -81,6 +81,8 @@ private:
     QRadioButton* hexShortChoice;
     QRadioButton* hexCharChoice;
     QRadioButton* charChoice;
+
+    
 
     FileDialogInfo* romDialogInfo;
 
